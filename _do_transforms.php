@@ -1261,7 +1261,12 @@ function tf22_datecreated_datatype($ntstring) {
 # $trail is het rewrite-spoor van de vouwende transforms (tf6/tf7/tf8/tf11/tf17), zie
 # tf_trail_note(). Zonder dat spoor vindt tf23 een gevouwen waarde niet meer terug en laat hij
 # de annotatie vallen; de resolvers draaien geen transforms en geven daarom geen spoor mee.
-require_once __DIR__ . '/../../../omeka-s-custom/value_annotations.php';
+# De gedeelde implementatie in omeka-s-custom/ is leidend: de content-negotiation-resolvers
+# (gtm-rdf-resolver.php, gtm-ark-rdf-resolver.php) includen hetzelfde bestand, en tf23 moet
+# byte-identieke reificaties opleveren als zij. Staat die er niet — een clone van deze repo,
+# zonder de Omeka-installatie ernaast — dan valt hij terug op de meegeleverde kopie.
+$va_shared = __DIR__ . '/../../../omeka-s-custom/value_annotations.php';
+require_once is_file($va_shared) ? $va_shared : __DIR__ . '/omeka-s-custom/value_annotations.php';
 
 function tf23_value_annotations($ntstring, $id, $mysqli, array $trail = []) {
 	return nt_add_value_annotations($ntstring, $id, $mysqli, $trail);

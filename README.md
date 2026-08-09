@@ -67,6 +67,29 @@ qlever_reindex = /pad/naar/reindex.sh
 Ontbreekt een sleutel, dan stopt het betreffende script met een melding die het
 bestand en de sleutel noemt.
 
+## Gedeelde code: value annotations
+
+`tf23` zet Omeka's value annotations om naar klassieke `rdf:Statement`-reificatie.
+Die omzetting staat in `value_annotations.php` en is bewust één implementatie,
+gedeeld met twee scripts die búiten deze repo staan:
+
+- `omeka-s-custom/gtm-rdf-resolver.php`
+- `omeka-s-custom/gtm-ark-rdf-resolver.php`
+
+Beide doen de content-negotiation voor losse resources. Wat zij teruggeven en
+wat in de dump belandt moet byte-identiek zijn; daarom mag er maar één versie
+van die code bestaan.
+
+Op de server is `../../../omeka-s-custom/value_annotations.php` daarom leidend.
+`_do_transforms.php` laadt dat bestand als het er staat, en valt anders terug op
+de kopie in `omeka-s-custom/` in deze repo — die is er voor een clone zonder
+Omeka-installatie ernaast. Wijzig je de gedeelde versie, ververs dan ook die
+kopie, anders draait een clone op verouderde code:
+
+```sh
+cp ../../../omeka-s-custom/value_annotations.php omeka-s-custom/
+```
+
 ## Benodigdheden
 
 PHP 8.5, Python 3 (`pymongo`, `pymysql`, `tqdm`), MongoDB, MySQL en de
