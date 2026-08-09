@@ -1,0 +1,7 @@
+{
+    "require": {
+        "easyrdf/easyrdf": "^1.1.1",
+        "mongodb/mongodb": "^2.0.0",
+        "divineomega/php-cli-progress-bar": "^2.1"
+    }
+}
