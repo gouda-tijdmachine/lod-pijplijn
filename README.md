@@ -1,71 +1,81 @@
 # lod-pijplijn
 
-The pipeline that builds the Gouda Tijdmachine knowledge graph: it harvests
-Omeka S resources, transforms them to RDF, and publishes one n-triples dump
-for QLever to index.
+De pijplijn die de kennisgraaf van de Gouda Tijdmachine bouwt: hij oogst de
+resources uit Omeka S, transformeert ze naar RDF en publiceert één
+n-triples-dump die QLever indexeert.
 
-## Running it
+De volledige beschrijving van de keten — wat elke stap doet, waaróm hij daar
+staat, welke volgorde-afhankelijkheden hard zijn en welke poorten een publicatie
+kunnen tegenhouden — staat in
+[Gouda Tijdmachine Linked Data Pijplijn](https://www.goudatijdmachine.nl/omeka/s/data/page/gouda-tijdmachine-linked-data-pijplijn).
+Deze README beperkt zich tot het draaien en inrichten van de scripts.
 
-`./do.sh` runs the whole chain:
+## Draaien
 
-| Step | Script | What it does |
+`./do.sh` doorloopt de hele keten:
+
+| Stap | Script | Wat het doet |
 |------|--------|--------------|
-| 1 | `_do_update_modified_data_resource.sh` | stamps the dataset description as modified |
-| 2 | `_do_set_empty_mongo_to_reindex.php` | marks empty MongoDB records for re-harvest |
-| 3 | `_do_cleanup_deleted_mongo.py` | drops deleted/unpublished resources from the object store |
-| 4 | `_do_update_nt.php` | harvests new/changed resources and applies the transforms in `_do_transforms.php` |
-| 5 | `_do_prepare.sh` | collects, swaps api URIs for ARK PIDs, sorts/dedupes, gzips |
-| 6 | `_do_publish.sh` | triggers the QLever re-index |
-| 7 | `_do_update_datasetdescription.sh` | writes the new distribution size back to Omeka |
+| 1 | `_do_update_modified_data_resource.sh` | zet de datasetbeschrijving op gewijzigd, vóór het oogsten |
+| 2 | `_do_set_empty_mongo_to_reindex.php` | markeert lege MongoDB-records voor heroogst |
+| 3 | `_do_cleanup_deleted_mongo.py` | verwijdert verwijderde en niet-gepubliceerde resources uit de objectstore |
+| 4 | `_do_update_nt.php` | oogst nieuwe en gewijzigde resources en past de transformaties uit `_do_transforms.php` toe |
+| 5 | `_do_prepare.sh` | verzamelt alles, wisselt api-URI's om naar ARK-PID's, sorteert en ontdubbelt, en gzipt |
+| 6 | `_do_publish.sh` | start de herindexering van QLever |
+| 7 | `_do_update_datasetdescription.sh` | schrijft de nieuwe distributiegrootte terug naar Omeka |
 
-The per-resource RDF transforms run at harvest time (step 4), not in step 5,
-so changing a transform means re-harvesting the affected resources.
+De RDF-transformaties per resource draaien tijdens het oogsten (stap 4), niet in
+stap 5. Een gewijzigde transformatie werkt dus pas door ná een heroogst van de
+betrokken resources.
 
-`_do_update_nt.php` and `_do_prepare.sh` both take resource ids as arguments
-and then run in test mode, touching neither the production dump nor the
-incremental watermark.
+`_do_update_nt.php` en `_do_prepare.sh` nemen allebei resource-id's als argument
+en draaien dan in testmodus: ze laten zowel de productiedump als het
+incrementele watermerk (`_do_update_nt.dat`) ongemoeid.
 
-## Output
+## Uitvoer
 
-Everything the build produces goes to `out/` and is not in git:
+Alles wat de build oplevert komt in `out/` terecht en staat niet in git:
 
-- `out/goudatijdmachine.nt` — the full dump (several GB)
-- `out/goudatijdmachine.nt.gz` — what gets published; the Omeka files
-  directory symlinks to it, and that URL is what QLever fetches
-- `out/goudatijdmachine.test*.nt` — test-mode output
+- `out/goudatijdmachine.nt` — de volledige dump (enkele GB's)
+- `out/goudatijdmachine.nt.gz` — wat gepubliceerd wordt; de Omeka-bestandsmap
+  verwijst er met een symlink naar, en dát is de URL die QLever ophaalt
+- `out/goudatijdmachine.test*.nt` — uitvoer van de testmodus
 
-## Configuration
+## Configuratie
 
-Credentials and internal endpoints are not in this repo. Three flat,
-section-less ini files are read from the Omeka config directory
+Inloggegevens en interne adressen staan niet in deze repository. Drie platte
+ini-bestanden (zonder secties) worden gelezen uit de Omeka-configuratiemap
 (`../../../omeka-s-config/`, chmod 600):
 
 ```ini
-; database.ini — the existing Omeka database config
+; database.ini — de bestaande Omeka-databaseconfiguratie
 user     = ...
 password = ...
 dbname   = ...
 host     = ...
 
-; omeka-api.ini — Omeka S API keypair, for harvesting over the API
+; omeka-api.ini — het Omeka S API-sleutelpaar, om over de API te oogsten
 key_identity   = ...
 key_credential = ...
 
-; lod-pipeline.ini — infrastructure endpoints
+; lod-pipeline.ini — de interne eindpunten
 mongo_server   = mongodb://...:27017
-qlever_ssh     = user@host
-qlever_reindex = /path/to/reindex.sh
+qlever_ssh     = gebruiker@host
+qlever_reindex = /pad/naar/reindex.sh
 ```
 
-## Requirements
+Ontbreekt een sleutel, dan stopt het betreffende script met een melding die het
+bestand en de sleutel noemt.
 
-PHP 8.5, Python 3 (`pymongo`, `pymysql`, `tqdm`), MongoDB, MySQL, and
-Composer dependencies:
+## Benodigdheden
+
+PHP 8.5, Python 3 (`pymongo`, `pymysql`, `tqdm`), MongoDB, MySQL en de
+Composer-afhankelijkheden:
 
 ```sh
 git clone --recursive https://github.com/gouda-tijdmachine/lod-pijplijn
 composer install
 ```
 
-`geoPHP` is a submodule; `--recursive` (or `git submodule update --init`)
-is required for `_do_update_nt.php` to load it.
+`geoPHP` is een submodule; zonder `--recursive` (of `git submodule update
+--init`) kan `_do_update_nt.php` hem niet laden.
