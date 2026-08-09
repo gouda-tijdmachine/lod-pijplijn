@@ -1,12 +1,12 @@
-# lod-pijplijn
+# Gouda Tijdmachine Linked Data Pijplijn
 
 De pijplijn die de kennisgraaf van de Gouda Tijdmachine bouwt: hij oogst de
 resources uit Omeka S, transformeert ze naar RDF en publiceert één
-n-triples-dump die QLever indexeert.
+[n-triples-dump](https://datasetregister.netwerkdigitaalerfgoed.nl/dataset?uri=https://n2t.net/ark:/60537/bD64Hu) die QLever indexeert en querybaar maakt via https://sparql.goudatijdmachine.nl/.
 
-De volledige beschrijving van de keten — wat elke stap doet, waaróm hij daar
+De volledige beschrijving van de keten (wat elke stap doet, waaróm hij daar
 staat, welke volgorde-afhankelijkheden hard zijn en welke poorten een publicatie
-kunnen tegenhouden — staat in
+kunnen tegenhouden) staat in
 [Gouda Tijdmachine Linked Data Pijplijn](https://www.goudatijdmachine.nl/omeka/s/data/page/gouda-tijdmachine-linked-data-pijplijn).
 Deze README beperkt zich tot het draaien en inrichten van de scripts.
 
@@ -36,10 +36,10 @@ incrementele watermerk (`_do_update_nt.dat`) ongemoeid.
 
 Alles wat de build oplevert komt in `out/` terecht en staat niet in git:
 
-- `out/goudatijdmachine.nt` — de volledige dump (enkele GB's)
-- `out/goudatijdmachine.nt.gz` — wat gepubliceerd wordt; de Omeka-bestandsmap
+- `out/goudatijdmachine.nt` » de volledige dump (enkele GB's)
+- `out/goudatijdmachine.nt.gz` » wat gepubliceerd wordt; de Omeka-bestandsmap
   verwijst er met een symlink naar, en dát is de URL die QLever ophaalt
-- `out/goudatijdmachine.test*.nt` — uitvoer van de testmodus
+- `out/goudatijdmachine.test*.nt` » uitvoer van de testmodus
 
 ## Configuratie
 
@@ -48,17 +48,17 @@ ini-bestanden (zonder secties) worden gelezen uit de Omeka-configuratiemap
 (`../../../omeka-s-config/`, chmod 600):
 
 ```ini
-; database.ini — de bestaande Omeka-databaseconfiguratie
+; database.ini » de bestaande Omeka-databaseconfiguratie
 user     = ...
 password = ...
 dbname   = ...
 host     = ...
 
-; omeka-api.ini — het Omeka S API-sleutelpaar, om over de API te oogsten
+; omeka-api.ini » het Omeka S API-sleutelpaar, om over de API te oogsten
 key_identity   = ...
 key_credential = ...
 
-; lod-pipeline.ini — de interne eindpunten
+; lod-pipeline.ini » de interne eindpunten
 mongo_server   = mongodb://...:27017
 qlever_ssh     = gebruiker@host
 qlever_reindex = /pad/naar/reindex.sh
