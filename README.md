@@ -73,9 +73,9 @@ PHP 8.5, Python 3 (`pymongo`, `pymysql`, `tqdm`), MongoDB, MySQL en de
 Composer-afhankelijkheden:
 
 ```sh
-git clone --recursive https://github.com/gouda-tijdmachine/lod-pijplijn
+git clone https://github.com/gouda-tijdmachine/lod-pijplijn
 composer install
 ```
 
-`geoPHP` is een submodule; zonder `--recursive` (of `git submodule update
---init`) kan `_do_update_nt.php` hem niet laden.
+Ook geoPHP loopt via Composer (`phayes/geophp`): `cor3` gebruikt het om uit een
+WKT-polygoon de oppervlakte in m² te berekenen.

@@ -1,8 +1,7 @@
 #!/usr/bin/php
 <?php
 
-require_once "vendor/autoload.php";
-require_once 'geoPHP/geoPHP.inc';
+require_once "vendor/autoload.php";   # incl. geoPHP (phayes/geophp), gebruikt door cor3
 require_once __DIR__ . '/_do_transforms.php';   # cor*/tf* pipeline + transform_resource()
 
 

@@ -13,7 +13,8 @@
 # Omeka mysqli connection to resolve cross-referenced resources' ARK PIDs. Emitted
 # triples are byte-stable so the downstream sort_unique dedups them across resources.
 #
-# Requires geoPHP (for cor3's area()) to be loaded by the including script.
+# Requires geoPHP (for cor3's area()); it comes from composer (phayes/geophp), so the
+# including script only has to require vendor/autoload.php.
 # ===========================================================================
 
 const TF_RDF_TYPE     = '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>';
